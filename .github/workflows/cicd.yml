@@ -47,9 +47,10 @@ jobs:
         username: ${{ secrets.SSH_USER }}
         key: ${{ secrets.SSH_KEY }}
         port: 22
-        known_hosts: ${{ secrets.KNOWN_HOSTS }}
         script: |
           docker pull ${{ secrets.DOCKER_USERNAME }}/django-app:latest
           docker stop django-app || true
           docker rm django-app || true
           docker run -d -p 8000:8000 --name django-app ${{ secrets.DOCKER_USERNAME }}/django-app:latest
+          docker exec -i django-app python manage.py migrate --noinput
+          docker exec -i django-app python manage.py collectstatic --noinput
